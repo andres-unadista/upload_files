@@ -24,11 +24,17 @@
                         </thead>
                         <tbody>
                             @foreach($files as $file)
-                                <tr>
-                                    <td scope="row">{{ $file->name_file }}</td>
-                                    <td><a target="_blank" href="{{ route('files.displayImage', $file->id) }}" class="btn btn-outline-secondary">Ver</a> </td>
-                                    <td><a href="storage/{{ $file->user_id }}/{{ $file->name_file }}" class="btn btn-outline-danger">Eliminar</a></td>
-                                </tr>
+                            <tr>
+                                <td scope="row">{{ $file->name_file }}</td>
+                                <td><a target="_blank" href="{{ route('files.displayImage', $file->id) }}" class="btn btn-outline-secondary">Ver</a> </td>
+                                <td>
+                                    <form method="POST" action="{{route('files.destroy', ['idFile' => $file->id])}}">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-outline-danger">Eliminar</button>
+                                    </form>
+                                </td>
+                            </tr>
                             @endforeach
                         </tbody>
                     </table>

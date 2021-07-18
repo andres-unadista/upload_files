@@ -31,7 +31,7 @@ class FileController extends Controller
     public function displayImages(File $file = null)
     {
         if (isset($file) && ($file->user_id === Auth::id())) {
-            return redirect('storage/' . Auth::id() . '/' . $file->name_file);
+            return redirect('storage/' . Auth::id() . '/' . $file->code_name);
         } else {
             abort(403);
         }
@@ -69,12 +69,18 @@ class FileController extends Controller
     public function saveFile(array $files, string $user_id): void
     {
         foreach ($files as $file) {
-            $nameOriginalFile = (explode('.', $file->getClientOriginalName()))[0];
-            $fileName = time() . Str::slug($nameOriginalFile) . '.' . $file->getClientOriginalExtension();
-            $saveFile = Storage::putFileAs('/public/' . $user_id . '/', $file, $fileName);
+            $nameFile = (explode('.', $file->getClientOriginalName()))[0];
+            $fileOriginal = time() .
+                            Str::slug($nameFile) . '.' .
+                            $file->getClientOriginalExtension();
+            $fileEncrypted = encrypt($fileOriginal).'.'.$file->getClientOriginalExtension();
+            $saveFile = Storage::putFileAs('/public/' . $user_id . '/',
+                                            $file,
+                                            $fileEncrypted);
             if ($saveFile) {
                 File::create([
-                    'name_file' => $fileName,
+                    'name_file' => $fileOriginal,
+                    'code_name' => $fileEncrypted,
                     'user_id' => $user_id,
                 ]);
                 Alert::success('Completado', 'Archivos cargados con éxito');
@@ -82,5 +88,21 @@ class FileController extends Controller
                 Alert::error('Error', 'Archivos no cargados');
             }
         }
+    }
+
+    /**
+     * Destroy a created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy(Request $request, int $idFile)
+    {
+        $file = File::whereId($idFile)->firstOrFail();
+        unlink(public_path('storage/' . Auth::id() . '/' . $file->name_file));
+        $file->delete();
+
+        Alert::info('Información', 'La imagen fue eliminada');
+        return back();
     }
 }

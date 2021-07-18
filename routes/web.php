@@ -27,4 +27,5 @@ Route::prefix('files')->group(function () {
     Route::post('/store', [App\Http\Controllers\FileController::class, 'store'])->name('user.files.store');
     Route::get('/list', [App\Http\Controllers\FileController::class, 'index'])->name('files.list');
     Route::get('/list/{file}', [App\Http\Controllers\FileController::class, 'displayImages'])->name('files.displayImage');
+    Route::delete('/list/{idFile}', [App\Http\Controllers\FileController::class, 'destroy'])->name('files.destroy');
 });
