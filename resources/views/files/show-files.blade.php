@@ -26,7 +26,7 @@
                             @foreach($files as $file)
                                 <tr>
                                     <td scope="row">{{ $file->name_file }}</td>
-                                    <td><a href="/storage/{{Auth::id()}}/{{$file->name_file}}" class="btn btn-outline-secondary">Ver</a> </td>
+                                    <td><a target="_blank" href="{{ route('files.displayImage', $file->id) }}" class="btn btn-outline-secondary">Ver</a> </td>
                                     <td><a href="storage/{{ $file->user_id }}/{{ $file->name_file }}" class="btn btn-outline-danger">Eliminar</a></td>
                                 </tr>
                             @endforeach

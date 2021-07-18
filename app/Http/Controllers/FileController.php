@@ -3,12 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\File;
-use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\File as FacadesFile;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use RealRashid\SweetAlert\Facades\Alert;
 
 class FileController extends Controller
@@ -30,18 +28,13 @@ class FileController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function displayImage(string $filename)
+    public function displayImages(File $file = null)
     {
-        try {
-            $file = Storage::get('public/' . Auth::id(). '/'. $filename);
-            $response = Response::make($file, 200);
-            $response->header("Content-Type", 'image/jpeg');
-            $response->header("Content-Type", 'image/png');
-            return $response;
-        } catch (Exception $e) {
-            abort(404);
+        if (isset($file) && ($file->user_id === Auth::id())) {
+            return redirect('storage/' . Auth::id() . '/' . $file->name_file);
+        } else {
+            abort(403);
         }
-
     }
 
     /**
@@ -76,10 +69,12 @@ class FileController extends Controller
     public function saveFile(array $files, string $user_id): void
     {
         foreach ($files as $file) {
-            $saveFile = Storage::putFileAs('/public/' . $user_id . '/', $file, $file->getClientOriginalName());
+            $nameOriginalFile = (explode('.', $file->getClientOriginalName()))[0];
+            $fileName = time() . Str::slug($nameOriginalFile) . '.' . $file->getClientOriginalExtension();
+            $saveFile = Storage::putFileAs('/public/' . $user_id . '/', $file, $fileName);
             if ($saveFile) {
                 File::create([
-                    'name_file' => $file->getClientOriginalName(),
+                    'name_file' => $fileName,
                     'user_id' => $user_id,
                 ]);
                 Alert::success('Completado', 'Archivos cargados con éxito');

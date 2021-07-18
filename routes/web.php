@@ -26,5 +26,5 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 Route::prefix('files')->group(function () {
     Route::post('/store', [App\Http\Controllers\FileController::class, 'store'])->name('user.files.store');
     Route::get('/list', [App\Http\Controllers\FileController::class, 'index'])->name('files.list');
-    Route::get('/list/{filename}', [App\Http\Controllers\FileController::class, 'displayImage'])->name('files.displayImage');
+    Route::get('/list/{file}', [App\Http\Controllers\FileController::class, 'displayImages'])->name('files.displayImage');
 });
